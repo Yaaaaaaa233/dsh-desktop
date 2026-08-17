@@ -201,6 +201,9 @@ async function restartBackend() {
 /** 冒烟测试模式：DSH_DESKTOP_SMOKE=1 时隐藏窗口，加载成功后打印标记并自动退出。 */
 const SMOKE = Boolean(process.env.DSH_DESKTOP_SMOKE)
 
+/** 主窗口固定标题：不随网页/对话标题变化。 */
+const WINDOW_TITLE = 'DSH desktop'
+
 function createMainWindow(url) {
   const win = new BrowserWindow({
     width: 1280,
@@ -208,7 +211,7 @@ function createMainWindow(url) {
     minWidth: 940,
     minHeight: 640,
     show: !SMOKE,
-    title: 'DSH Desktop',
+    title: WINDOW_TITLE,
     backgroundColor: '#0d1221',
     webPreferences: {
       contextIsolation: true,
@@ -217,6 +220,11 @@ function createMainWindow(url) {
     },
   })
   win.setMenuBarVisibility(false)
+  // 网页 <title> 会随所选对话标题变化；阻止它改窗口标题，固定为应用名。
+  win.on('page-title-updated', (event) => {
+    event.preventDefault()
+    win.setTitle(WINDOW_TITLE)
+  })
   win.webContents.setWindowOpenHandler(({ url: u }) => {
     if (u.startsWith('http://') || u.startsWith('https://')) shell.openExternal(u)
     return { action: 'deny' }
