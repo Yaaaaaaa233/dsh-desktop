@@ -13,31 +13,12 @@ const readline = require('node:readline')
 const { existsSync } = require('node:fs')
 const { join, delimiter } = require('node:path')
 const os = require('node:os')
-const net = require('node:net')
 
 /** 匹配 dsh web 打印的 URL 行，例如 `dsh web: http://127.0.0.1:61487`。 */
 const URL_LINE_RE = /dsh web:\s*(https?:\/\/\S+)/i
 
 const BOOT_TIMEOUT_MS = 60_000
 const MIN_NODE_MAJOR = 24
-
-/**
- * 优先使用的固定端口。浏览器 localStorage 按“源”（含端口）隔离：若每次启动
- * 都用随机端口，自建皮肤等前端本地数据就会因源变化而在重启后丢失。桌面端
- * 优先固定该端口让重启保持同源；仅当端口被占用时才退回随机端口。
- */
-const PREFERRED_PORT = 32091
-
-/** 返回 preferred（若空闲）或 0（回退到系统随机分配）。 */
-function pickPreferredPort(preferred) {
-  return new Promise(resolve => {
-    const server = net.createServer()
-    server.once('error', () => resolve(0))
-    server.listen(preferred, '127.0.0.1', () => {
-      server.close(() => resolve(preferred))
-    })
-  })
-}
 
 /** 默认 DSH 仓库位置；可用 DSH_REPO 环境变量覆盖。 */
 function defaultRepoDir() {
@@ -160,12 +141,7 @@ async function startBackend({ repoDir = defaultRepoDir(), dshHome, port = 0, onL
   if (dshHome) env.DSH_HOME = dshHome
   else delete env.DSH_HOME // 显式回退到系统默认 ~/.dsh
 
-  // 未显式指定端口时，优先固定端口（保持同源以持久化前端 localStorage），
-  // 端口被占则退回 0（随机分配）。
-  let effectivePort = port
-  if (effectivePort === 0) effectivePort = await pickPreferredPort(PREFERRED_PORT)
-
-  const child = spawn(nodeBin, [bin, 'web', '--port', String(effectivePort)], {
+  const child = spawn(nodeBin, [bin, 'web', '--port', String(port)], {
     cwd: repoDir,
     env,
     stdio: ['ignore', 'pipe', 'pipe'],
