@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>外观设置</title>
+  <link rel="stylesheet" href="./settings.css" />
+</head>
+<body>
+  <header class="titlebar">
+    <span class="title">外观设置</span>
+    <button id="btn-close" class="icon-btn" title="关闭">✕</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>主题色</h2>
+      <div class="row">
+        <input type="color" id="theme-color" value="#4176e6" />
+        <button id="btn-theme-reset" class="ghost" title="恢复 DSH 默认蓝色">恢复默认</button>
+      </div>
+      <p class="hint">更改 DSH 界面的主品牌色（按钮、高亮、选中态等）。</p>
+    </section>
+
+    <section>
+      <h2>背景</h2>
+      <div class="seg" id="bg-kind">
+        <button data-kind="default">默认</button>
+        <button data-kind="color">纯色</button>
+        <button data-kind="gradient">渐变</button>
+        <button data-kind="image">图片</button>
+      </div>
+
+      <div class="field" data-show="color">
+        <label>背景颜色</label>
+        <input type="color" id="bg-color" value="#f6f7fb" />
+      </div>
+
+      <div class="field" data-show="gradient">
+        <label>渐变起色</label>
+        <input type="color" id="bg-grad-from" value="#1e2a4a" />
+        <label>渐变止色</label>
+        <input type="color" id="bg-grad-to" value="#4a3f6b" />
+        <label>角度 <span id="grad-angle-val">135°</span></label>
+        <input type="range" id="bg-grad-angle" min="0" max="360" value="135" />
+      </div>
+
+      <div class="field" data-show="image">
+        <label>背景图片</label>
+        <div class="row">
+          <input type="text" id="bg-image-path" readonly placeholder="未选择" />
+          <button id="btn-pick-image" class="primary">选择…</button>
+        </div>
+        <label>不透明度 <span id="bg-opacity-val">85%</span></label>
+        <input type="range" id="bg-opacity" min="10" max="100" value="85" />
+        <label>遮罩颜色（保证文字可读）</label>
+        <input type="color" id="bg-overlay" value="#0d1221" />
+        <input type="range" id="bg-overlay-alpha" min="0" max="90" value="45" />
+      </div>
+      <p class="hint">背景图会缩放铺满窗口，置于聊天内容下层；可用遮罩调整可读性。</p>
+    </section>
+
+    <section>
+      <h2>自定义 CSS</h2>
+      <textarea id="custom-css" rows="6" placeholder="例如：&#10;.conversation { font-size: 15px; }&#10;::-webkit-scrollbar { width: 10px; }"></textarea>
+      <p class="hint">追加在页面末尾，可覆盖一切默认样式；改动即时生效。</p>
+    </section>
+  </main>
+
+  <footer>
+    <span id="status" class="status"></span>
+    <div class="footer-btns">
+      <button id="btn-reset-all" class="ghost">恢复默认</button>
+      <button id="btn-browser" class="ghost" title="在系统浏览器打开 DSH">浏览器</button>
+      <button id="btn-restart" class="ghost" title="重启 DSH 后端">重启后端</button>
+      <button id="btn-quit" class="danger">退出应用</button>
+    </div>
+  </footer>
+
+  <script src="./settings.js"></script>
+</body>
+</html>

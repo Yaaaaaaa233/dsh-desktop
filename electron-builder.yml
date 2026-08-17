@@ -1,0 +1,23 @@
+appId: com.dsh.desktop
+productName: DSH Desktop
+directories:
+  output: dist-app
+  buildResources: build
+electronDownload:
+  cache: ../.electron-cache
+files:
+  - src/**/*
+  - package.json
+extraResources:
+  # DSH 后端运行时（pnpm deploy 产物压缩为单文件，首次启动解压到 userData；
+  # 避免 electron-builder 对 extraResources 里 node_modules 的特殊处理）
+  - from: resources/dsh-runtime.tar.gz
+    to: dsh-runtime.tar.gz
+  # 独立 Node >= 24 运行时（DSH loader 依赖 Node 24+ 内部模块解析）
+  - from: resources/node
+    to: node
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - dir
+npmRebuild: false

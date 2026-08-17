@@ -1,0 +1,30 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-app/
+build/
+
+# DSH 后端运行时（build:runtime 的产物，含 node_modules，体积大且可再生成）
+runtime/
+resources/node/
+resources/dsh-runtime.tar.gz
+
+# web profile 备份（含配置，可能带 API key，不入库）
+web-profile-backup-*/
+
+# 日志 / 系统
+*.log
+.DS_Store
+.selftest/
+.npm-cache/
+.electron-cache/
+.electron-builder-cache/
+
+# 密钥与本地配置（绝不入库）
+.env
+.env.*
+*.pem
+*.p12
+*.key
+*.token
+*.local

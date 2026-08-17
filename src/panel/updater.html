@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>检查更新</title>
+  <link rel="stylesheet" href="./updater.css" />
+</head>
+<body>
+  <header class="titlebar">
+    <span class="title">检查更新</span>
+    <button id="btn-close" class="icon-btn" title="关闭">✕</button>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="hero-row">
+        <span id="summary" class="summary">正在检查更新…</span>
+        <button id="btn-refresh" class="ghost">重新检查</button>
+      </div>
+      <p class="hint">统一检查三层更新源：桌面应用、DSH 官方、dsh-web-ui 插件。全部为只读探测。</p>
+    </section>
+
+    <section>
+      <h2>① DSH Desktop 应用</h2>
+      <div class="card" id="card-app">
+        <div class="card-line">
+          <span class="ver">当前 <b id="app-current">—</b></span>
+          <span class="ver">最新 <b id="app-latest">—</b></span>
+          <span id="app-badge" class="badge">…</span>
+        </div>
+        <p id="app-detail" class="detail">应用本体无法自动升级：需要重新打包安装。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>② DSH 官方（deepseek-harness）</h2>
+      <div class="card" id="card-official">
+        <div class="card-line">
+          <span class="ver">当前 <b id="official-current">—</b></span>
+          <span class="ver">最新 <b id="official-latest">—</b></span>
+          <span id="official-badge" class="badge">…</span>
+        </div>
+        <p id="official-detail" class="detail">官方更新需要重新拉取并打包，无法自动完成。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>③ dsh-web-ui 插件</h2>
+      <div class="card" id="card-plugins">
+        <div class="card-line">
+          <span class="ver">当前 <b id="plugins-current">—</b></span>
+          <span class="ver">最新 <b id="plugins-latest">—</b></span>
+          <span id="plugins-badge" class="badge">…</span>
+          <button id="btn-plugins-update" class="primary" style="display:none">升级插件</button>
+        </div>
+        <p id="plugins-detail" class="detail">插件支持自动升级（在 profile 内运行 pnpm update）。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="status" class="status"></span>
+    <div class="footer-btns">
+      <button id="btn-browser" class="ghost" title="在浏览器打开 DSH 官网仓库">官方仓库</button>
+      <button id="btn-restart" class="ghost" title="重启 DSH 后端（升级插件后生效）">重启后端</button>
+    </div>
+  </footer>
+
+  <script src="./updater.js"></script>
+</body>
+</html>
