@@ -28,3 +28,6 @@ web-profile-backup-*/
 *.key
 *.token
 *.local
+
+# 多内核并存的运行时构建产物（runtime-016 等）
+runtime*/

@@ -9,8 +9,9 @@ const { mkdirSync, statSync } = require('node:fs')
 const { join } = require('node:path')
 
 const ROOT = join(__dirname, '..')
-const RUNTIME = join(ROOT, 'runtime')
-const OUT = join(ROOT, 'resources', 'dsh-runtime.tar.gz')
+// 输入/输出都可用环境变量覆盖，便于并行保留多个内核版本的运行时。
+const RUNTIME = process.env.DSH_RUNTIME_DIR || join(ROOT, 'runtime')
+const OUT = process.env.DSH_RUNTIME_ARCHIVE || join(ROOT, 'resources', 'dsh-runtime.tar.gz')
 
 mkdirSync(join(ROOT, 'resources'), { recursive: true })
 

@@ -11,7 +11,7 @@
  */
 
 const { execFileSync } = require('node:child_process')
-const { readFileSync, writeFileSync, mkdirSync, rmSync, statSync } = require('node:fs')
+const { readFileSync, writeFileSync, mkdirSync, rmSync, statSync, existsSync, copyFileSync } = require('node:fs')
 const { join, extname } = require('node:path')
 
 const ROOT = join(__dirname, '..')
@@ -19,6 +19,9 @@ const BUILD = join(ROOT, 'build')
 const OUT_ICNS = join(BUILD, 'icon.icns')
 
 const ICON_SRC = process.env.DSH_ICON_SRC || '/Users/yea/dev/deepseek-harness/apps/web/public/favicon.svg'
+// 保留的自定义成品图标。没有显式指定 DSH_ICON_SRC 时优先复用它，
+// 避免重新构建时被默认鲸鱼图标覆盖（2026-09-11 就这么覆盖过一次）。
+const CUSTOM_ICNS = join(ROOT, 'resources', 'icon.custom.icns')
 const IS_RASTER = ['.jpg', '.jpeg', '.png', '.webp'].includes(extname(ICON_SRC).toLowerCase())
 
 const SIZE = 1024
@@ -101,6 +104,14 @@ async function buildIconset() {
 }
 
 async function main() {
+  // 1) 显式指定了来源 → 按来源重绘；否则若存在保留的自定义图标 → 直接复用（不重绘，避免二次套蒙版）
+  if (!process.env.DSH_ICON_SRC && existsSync(CUSTOM_ICNS)) {
+    mkdirSync(BUILD, { recursive: true })
+    copyFileSync(CUSTOM_ICNS, OUT_ICNS)
+    console.log(`图标来源：${CUSTOM_ICNS}（保留的自定义图标，直接复用）`)
+    console.log(`图标已生成：${OUT_ICNS}（${(statSync(OUT_ICNS).size / 1024).toFixed(0)}KB）`)
+    return
+  }
   console.log(`图标来源：${ICON_SRC}（${IS_RASTER ? '位图' : 'SVG'}）`)
   const iconset = join(BUILD, 'icon.iconset')
   rmSync(iconset, { recursive: true, force: true })
