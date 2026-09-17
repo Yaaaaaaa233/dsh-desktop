@@ -101,6 +101,41 @@ function resolveBackendPaths(repoDir = defaultRepoDir()) {
 }
 
 /**
+ * 读取运行时/仓库的 dsh 版本号（两者根 package.json 都带 version）。
+ * @param {string} repoDir 运行时或仓库根目录
+ * @returns {string} 版本号；读不到时返回空串
+ */
+function readDshVersion(repoDir) {
+  for (const p of [join(repoDir, 'package.json'), join(repoDir, 'node_modules', '@deepseek-ai', 'dsh', 'package.json')]) {
+    try {
+      const v = JSON.parse(require('node:fs').readFileSync(p, 'utf8')).version
+      if (typeof v === 'string' && v) return v
+    } catch { /* 下一个候选 */ }
+  }
+  return ''
+}
+
+/**
+ * dsh >= 0.1.0-rc.6 的 `dsh web` 默认会打开系统浏览器（feat: open the ready
+ * Web UI by default, 2026-08-14）。桌面壳自己就是浏览器，必须传 `--no-open`，
+ * 否则每次启动都会额外弹一个浏览器标签页。rc.5 及更早不认识该 flag，所以按
+ * 版本判断，保证回退旧运行时也能正常启动。
+ * @param {string} version 形如 `0.1.2-rc.1`
+ * @returns {boolean} 是否支持 `--no-open`
+ */
+function supportsNoOpen(version) {
+  const m = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/.exec(version)
+  if (!m) return false
+  const numeric = Number(m[1]) * 1e6 + Number(m[2]) * 1e3 + Number(m[3])
+  if (numeric > 0 * 1e6 + 1 * 1e3 + 0) return true // >= 0.1.1
+  if (numeric < 0 * 1e6 + 1 * 1e3 + 0) return false // < 0.1.0
+  if (!m[4]) return true // 0.1.0 正式版
+  const rc = /^rc\.(\d+)$/.exec(m[4])
+  if (!rc) return true // alpha/beta 视作更新
+  return Number(rc[1]) >= 6
+}
+
+/**
  * 启动 DSH web 后端并等待其打印 URL。
  * @param {object} opts
  * @param {string} [opts.repoDir] DSH 仓库根目录（默认 ~/dev/deepseek-harness，可用 DSH_REPO 覆盖）
@@ -141,7 +176,7 @@ async function startBackend({ repoDir = defaultRepoDir(), dshHome, port = 0, onL
   if (dshHome) env.DSH_HOME = dshHome
   else delete env.DSH_HOME // 显式回退到系统默认 ~/.dsh
 
-  const child = spawn(nodeBin, [bin, 'web', '--port', String(port)], {
+  const child = spawn(nodeBin, [bin, 'web', ...(supportsNoOpen(readDshVersion(repoDir)) ? ['--no-open'] : []), '--port', String(port)], {
     cwd: repoDir,
     env,
     stdio: ['ignore', 'pipe', 'pipe'],
