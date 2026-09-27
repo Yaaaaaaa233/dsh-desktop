@@ -39,7 +39,9 @@ function parseDshHome(psOutput) {
 function detectOtherInstances({ home, excludePids = [] } = {}) {
   const found = []
   try {
-    const out = execFileSync('ps', ['-axo', 'pid=,command='], { encoding: 'utf8', timeout: EXEC_TIMEOUT })
+    // ww 重复两次 = 不限列宽；不加会被截到终端宽度（80 列），长路径下
+    // `…/lib/bin.js web` 的关键参数正好被截掉，导致漏报。
+    const out = execFileSync('ps', ['-wwaxo', 'pid=,command='], { encoding: 'utf8', timeout: EXEC_TIMEOUT })
     const exclude = new Set(excludePids.map(Number))
     const candidates = []
     for (const raw of out.split('\n')) {
