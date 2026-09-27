@@ -1,4 +1,4 @@
-undefined# DSH Desktop
+# DSH Desktop
 
 把 DeepSeek Harness（终端 + Web）打包成 macOS 桌面应用：Electron 窗口内直接加载 DSH 的
 Web UI，后端一键自动启动、随应用退出，并支持主题色 / 背景定制与自定义 CSS。
@@ -88,7 +88,7 @@ DSH_DESKTOP_SMOKE=1 npm start                            # 冒烟（隐藏窗口
 ## 已知限制
 
 - 后端依赖 Node ≥ 24（已随应用捆绑独立 node，无需系统安装）。
-- runtime 由  从 DSH 仓库扁平构建（无符号链接、单实例、自包含）；[ERR_PNPM_CANNOT_DEPLOY] A deploy is only possible from inside a workspace 方案已弃用（其链接结构会导致同依赖双实例、scope 机制失灵等运行时问题）。
+- runtime 由 `scripts/build-runtime.js` 从 DSH 仓库扁平构建（无符号链接、单实例、自包含）；早先的 `pnpm deploy` 方案已弃用（会报 `[ERR_PNPM_CANNOT_DEPLOY]`：其链接结构导致同依赖双实例、scope 机制失灵等运行时问题）。
 - 背景图以缩放后的 data URL 注入，超大图片（>1920px 宽）自动缩到 1920px 内。
 - 透明背景图层是「整个应用表面变透明 + 遮罩」的近似实现，个别弹层/对话框底色可能偏透，
   可用自定义 CSS 微调。

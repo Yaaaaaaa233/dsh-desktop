@@ -21,8 +21,9 @@
 
 const { readFileSync, existsSync, mkdirSync, rmSync, readdirSync, statSync, copyFileSync, lstatSync, realpathSync } = require('node:fs')
 const { join, dirname } = require('node:path')
+const { homedir } = require('node:os')
 
-const REPO = process.env.DSH_REPO || '/Users/yea/dev/deepseek-harness'
+const REPO = process.env.DSH_REPO || join(homedir(), 'dev', 'deepseek-harness')
 // 输出目录可用 DSH_RUNTIME_OUT 覆盖：多内核版本并存时各建各的，不互相覆盖
 // （回滚要用的 rc.2 运行时保持原样）。
 const RT = process.env.DSH_RUNTIME_OUT || join(__dirname, '..', 'runtime')

@@ -13,12 +13,13 @@
 const { execFileSync } = require('node:child_process')
 const { readFileSync, writeFileSync, mkdirSync, rmSync, statSync, existsSync, copyFileSync } = require('node:fs')
 const { join, extname } = require('node:path')
+const { homedir } = require('node:os')
 
 const ROOT = join(__dirname, '..')
 const BUILD = join(ROOT, 'build')
 const OUT_ICNS = join(BUILD, 'icon.icns')
 
-const ICON_SRC = process.env.DSH_ICON_SRC || '/Users/yea/dev/deepseek-harness/apps/web/public/favicon.svg'
+const ICON_SRC = process.env.DSH_ICON_SRC || join(homedir(), 'dev', 'deepseek-harness', 'apps', 'web', 'public', 'favicon.svg')
 // 保留的自定义成品图标。没有显式指定 DSH_ICON_SRC 时优先复用它，
 // 避免重新构建时被默认鲸鱼图标覆盖（2026-09-11 就这么覆盖过一次）。
 const CUSTOM_ICNS = join(ROOT, 'resources', 'icon.custom.icns')

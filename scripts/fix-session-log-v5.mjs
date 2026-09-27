@@ -15,10 +15,13 @@
  */
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { homedir } from 'node:os'
+import { pathToFileURL } from 'node:url'
 import { execFileSync } from 'node:child_process'
 
-const zstdMod = await import('/Users/yea/dev/deepseek-harness/packages/session/session-persistence-jsonl/lib/types/zstd.js')
-const coreMod = await import('/Users/yea/dev/deepseek-harness/packages/core/session/lib/types/index.js')
+const REPO = process.env.DSH_REPO || join(homedir(), 'dev', 'deepseek-harness')
+const zstdMod = await import(pathToFileURL(join(REPO, 'packages/session/session-persistence-jsonl/lib/types/zstd.js')).href)
+const coreMod = await import(pathToFileURL(join(REPO, 'packages/core/session/lib/types/index.js')).href)
 const { createZstdFrameDecoder, compressZstdFrame, scanZstdFrames } = zstdMod
 const { decodeStorageRecord } = coreMod
 

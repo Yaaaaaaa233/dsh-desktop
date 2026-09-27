@@ -7,8 +7,9 @@
 
 const { readFileSync, existsSync, cpSync, symlinkSync, readdirSync } = require('node:fs')
 const { join, dirname, basename } = require('node:path')
+const { homedir } = require('node:os')
 
-const REPO = process.env.DSH_REPO || '/Users/yea/dev/deepseek-harness'
+const REPO = process.env.DSH_REPO || join(homedir(), 'dev', 'deepseek-harness')
 const RT = join(__dirname, '..', 'runtime')
 const RT_NM = join(RT, 'node_modules')
 const RT_STORE = join(RT_NM, '.pnpm')

@@ -5,14 +5,17 @@
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { homedir } from 'node:os'
+import { pathToFileURL } from 'node:url'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 // repo 编译产物是 ESM；node 24 可直接 import .js（package.json 无 type:module 时按 CJS，
 // 但内容含 export 语法会失败）——因此用 createRequire 无法加载 ESM。
 // 改用动态 import 直接加载（node 会按内容检测 ESM 语法）。
-const zstdMod = await import('/Users/yea/dev/deepseek-harness/packages/session/session-persistence-jsonl/lib/types/zstd.js')
-const coreMod = await import('/Users/yea/dev/deepseek-harness/packages/core/session/lib/types/index.js')
+const REPO = process.env.DSH_REPO || join(homedir(), 'dev', 'deepseek-harness')
+const zstdMod = await import(pathToFileURL(join(REPO, 'packages/session/session-persistence-jsonl/lib/types/zstd.js')).href)
+const coreMod = await import(pathToFileURL(join(REPO, 'packages/core/session/lib/types/index.js')).href)
 const { createZstdFrameDecoder, scanZstdFrames } = zstdMod
 const { decodeStorageRecord } = coreMod
 
