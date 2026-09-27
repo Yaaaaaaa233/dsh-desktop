@@ -51,6 +51,7 @@ cd /Users/yea/Documents/DSH/dsh-desktop/scripts && node fix-session-log.mjs
 
 - 告诉用户修复完成，可以重新打开 DSH 加载历史
 - 提醒用户：桌面版和标准版共用 `~/.dsh`，**同一时间只能开一个 DSH 实例**操作同一会话，否则会再次写坏日志
+- 注意：0.1.5-rc.2 及以后的内核已有 per-session 写锁（session.lock / flock），双实例同时打开同一会话只会得到"会话已占用"拒绝，不会写坏；此警告主要针对旧内核并行、以及历史上无锁版本的遗留数据。
 - 损坏证据在 `session.jsonl.zstd.broken`，确认历史加载正常后可删除
 
 ## 只读诊断工具（如需要）

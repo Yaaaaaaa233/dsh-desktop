@@ -3,11 +3,13 @@
  * 并把外观设置（主题色 / 背景 / 自定义 CSS）实时注入页面。
  */
 
-const { app, BrowserWindow, Menu, dialog, ipcMain, shell, nativeImage } = require('electron')
+const { app, BrowserWindow, Menu, dialog, ipcMain, shell, nativeImage, Notification } = require('electron')
 const path = require('node:path')
 const fs = require('node:fs')
+const os = require('node:os')
 
 const { startBackend, resolveBackendPaths, defaultRepoDir } = require('./backend')
+const { detectOtherInstances, isOwnershipErrorLine } = require('./coexist')
 const { DEFAULTS, load: loadSettings, save: saveSettings, mergeSettings } = require('./settings')
 const { buildCss } = require('./styles')
 const { checkAll, runPluginUpdate, OFFICIAL_REPO } = require('./updater')
@@ -141,15 +143,77 @@ async function applyStyles() {
   }
 }
 
+// ── 多实例共存感知 ──────────────────────────────────────────────────────────
+
+/** 本实例将使用的数据目录（与 backend.js 的回退逻辑一致：DSH_HOME 缺省为 ~/.dsh）。 */
+function dshHome() {
+  return process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
+}
+
+/** 弹系统通知（best-effort）：不支持通知或失败时只记日志，绝不影响启动。 */
+function notify(title, body) {
+  try {
+    if (!Notification.isSupported()) {
+      log('notify', `系统不支持通知，仅记日志：${title} — ${body}`)
+      return
+    }
+    new Notification({ title, body }).show()
+  } catch (err) {
+    log('notify', `通知失败：${err.message}`)
+  }
+}
+
+/**
+ * 启动后端前检测共用同一数据目录的其他 DSH 实例（此时自己还没有后端子进程）。
+ * 检测到多个合并成一条通知；任何失败只记日志，不影响启动。
+ */
+function detectCoexistingInstances() {
+  try {
+    const others = detectOtherInstances({ home: dshHome(), excludePids: [] })
+    if (!others.length) return
+    const pids = others.map(o => o.pid).join('、')
+    log('boot', `检测到另一个 DSH 实例共用数据目录 ${dshHome()}：PID ${pids}`)
+    notify(
+      '检测到另一个 DSH 实例',
+      `另一实例（PID ${pids}）正在使用同一数据目录。同时打开同一会话时会提示"会话已占用"，这是防止两个实例写坏会话日志的保护机制。`,
+    )
+  } catch (err) {
+    log('boot', `共存检测失败（忽略）：${err.message}`)
+  }
+}
+
+/** 会话占用错误通知节流：60 秒内最多弹一条。 */
+const OWNERSHIP_NOTIFY_INTERVAL_MS = 60 * 1000
+let lastOwnershipNotifyAt = 0
+
+/** 会话占用错误人话化：命中错误行时节流弹通知；不影响日志记录。 */
+function maybeNotifyOwnershipError(line) {
+  try {
+    if (!isOwnershipErrorLine(line)) return
+    const now = Date.now()
+    if (now - lastOwnershipNotifyAt < OWNERSHIP_NOTIFY_INTERVAL_MS) return
+    lastOwnershipNotifyAt = now
+    notify(
+      '会话已被其他实例占用',
+      '该会话已在另一个 DSH 实例中打开。关闭另一实例后可继续写入；此机制用于防止两个实例同时写坏会话日志。',
+    )
+  } catch { /* 通知失败不影响日志与启动 */ }
+}
+
 // ── DSH 后端生命周期 ────────────────────────────────────────────────────────
 
 async function bootBackend() {
   log('boot', `启动 DSH 后端（repoDir=${repoDir()}）`)
+  detectCoexistingInstances() // 启动后端前先看是否有别的实例共用数据目录
   const { url, stop, child } = await startBackend({
     repoDir: repoDir(),
     dshHome: process.env.DSH_HOME,
     port: 0,
-    onLog: (kind, line) => log(kind, line.trimEnd()),
+    onLog: (kind, line) => {
+      const text = line.trimEnd()
+      log(kind, text)
+      maybeNotifyOwnershipError(text) // 会话占用错误人话化（节流；日志照旧写）
+    },
   })
   state.backend = { stop, child }
   state.url = url
