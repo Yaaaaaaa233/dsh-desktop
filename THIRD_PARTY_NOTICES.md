@@ -1,50 +1,27 @@
-# Third-Party Notices
+# 第三方来源与许可
 
-DSH Desktop bundles, wraps, or depends on the following third-party
-open-source projects. Each keeps its own license and copyright. This file
-summarizes the main components; the exact license texts live in each
-dependency's published package (`node_modules/.../LICENSE`) and in the
-bundled runtime under `runtime/` at build time.
+本仓库是官方 DeepSeek Harness Desktop 的独立社区扩展项目。DeepSeek 名称和标识属于各自权利人，本项目不代表官方。
 
-## Core runtime
+## 本地维护的鲸鱼插件
 
-- **DeepSeek Harness (@deepseek-ai/dsh)**
-  License: MIT
-  Copyright (c) 2026 DeepSeek
-  Bundled as the embedded backend runtime (`runtime/`, packaged as
-  `resources/dsh-runtime.tar.gz`).
+- 上游：[MeteorNOX/DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget)
+- 基线：npm `dsh-whale-widget@0.3.17`。
+- 上游代码：MIT，版权声明保留于 `packages/dsh-whale-widget/LICENSE`。
+- 本地改动：Desktop 设置页、启用开关、配置事件同步和分发元数据。
+- `assets/` 内的图片、动图与音效保留上游素材；它们不按本仓库 MIT 再许可。来源与使用范围见同目录上级的 `PROVENANCE.md`。`assets/whale-widget.js` 是代码。
+- 上游使用说明保留为 `UPSTREAM_README.md`。
 
-## Desktop shell
+## 上游皮肤中心
 
-- **Electron**
-  License: MIT (plus bundled Chromium and Node.js under their own licenses)
-  Copyright (c) Electron contributors. See
-  https://github.com/electron/electron/blob/main/LICENSE
-- **electron-builder**
-  License: MIT
-- **Node.js standalone runtime (`resources/node`)**
-  License: Node.js is licensed under the MIT license; V8 under the BSD-3-Clause
-  license. See https://github.com/nodejs/node/blob/main/LICENSE
+- 上游：[zhu1090093659/dsh-skins](https://github.com/zhu1090093659/dsh-skins)
+- 发布包：`@linxin666/dsh-client-ui-skin-center@0.4.4`。
+- 许可：Apache-2.0；下载与分发原始 npm 包，不修改或移除其中的声明和素材。
+- 仓库保存版本与完整性信息，不复制用户自定义壁纸或整套上游源码。
 
-## dsh-web-ui plugins (installed into the web profile)
+## 官方运行环境
 
-The `@linxin666/*` plugin suite (skin center, skins, aionui panel, task board,
-SSH, etc.) is licensed under Apache-2.0, with the following exception:
+DeepSeek Harness 是独立的上游运行环境，由用户自行安装。本仓库当前插件发行包不打包官方应用或 Harness 内核。
 
-- **`maid-atelier` skin** is licensed under **CC BY-NC-SA 4.0** and is
-  restricted to **non-commercial** use. If it is bundled or redistributed, that
-  non-commercial restriction extends to the distribution and its license and
-  attribution must be preserved.
-  See `packages/dsh-skins/skins/maid-atelier/LICENSE` and `.../NOTICE` in the
-  dsh-web-ui source.
+## 冻结的 Electron 壳
 
-## Build-time tooling
-
-- **sharp** — Apache-2.0
-- **@resvg/resvg-js** — MPL-2.0
-
----
-
-This product is an independent wrapper around DeepSeek Harness. "DeepSeek" and
-associated marks are trademarks of their respective owners; this project is not
-an official DeepSeek product and implies no endorsement.
+旧壳、图标和构建工具原样保留。其 Electron、Node、sharp、resvg、DSH 与旧 Web 插件的声明见 [原第三方说明](legacy/electron-shell/THIRD_PARTY_NOTICES.md)。归档文件的移动没有改变原许可范围。

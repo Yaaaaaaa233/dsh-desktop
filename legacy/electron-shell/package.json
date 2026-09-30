@@ -1,0 +1,25 @@
+{
+  "name": "dsh-desktop",
+  "productName": "DSH Desktop",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness 桌面应用：Electron 壳内嵌 dsh web 后端，一键独立运行，支持主题色/背景定制与自定义 CSS。",
+  "author": "DSH Desktop",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "selftest": "node scripts/selftest.js",
+    "e2e:backend": "ELECTRON_RUN_AS_NODE=1 electron scripts/e2e-backend.js",
+    "e2e:packaged": "ELECTRON_RUN_AS_NODE=1 electron scripts/e2e-packaged.js",
+    "smoke": "DSH_DESKTOP_SMOKE=1 electron .",
+    "build:runtime": "node scripts/build-runtime.js",
+    "build:app": "node scripts/make-icon.js && node scripts/build-runtime.js && node scripts/make-runtime-archive.js && ELECTRON_BUILDER_CACHE=../.electron-builder-cache electron-builder --mac dir",
+    "make:icon": "node scripts/make-icon.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.15.3",
+    "sharp": "^0.35.3"
+  }
+}

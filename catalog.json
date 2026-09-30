@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "testedEnvironment": {
+    "dsh": "0.2.0-rc.2",
+    "os": "macOS",
+    "arch": "arm64",
+    "date": "2026-09-30"
+  },
+  "legacy": {
+    "tag": "legacy-electron-shell-20260930",
+    "commit": "75ab5af",
+    "path": "legacy/electron-shell"
+  },
+  "plugins": [
+    {
+      "id": "whale",
+      "name": "dsh-whale-widget",
+      "version": "0.3.17-desktop.3",
+      "kind": "local",
+      "path": "packages/dsh-whale-widget",
+      "artifact": "dsh-whale-widget-0.3.17-desktop.3.tgz",
+      "upstream": {
+        "name": "dsh-whale-widget",
+        "version": "0.3.17",
+        "repository": "https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget",
+        "integrity": "sha512-eHB3MNbMyhv1y4Wd5JOB2qyYXQjSKJUZc2Yh8bZZldEzo4LxFCpixQWVeF9K29Bseje/8w59RfBM4+sKbB/Z1w=="
+      },
+      "verification": {
+        "installedVersion": "0.3.17-desktop.2",
+        "runtimeSha256": {
+          "lib/index.js": "14db6e7f58f63bdbb47ee046cc268e559b62a3ab3f943bfc35b5c076265ab316",
+          "lib/client.js": "5d92f02eb3b044f0c51d3cac0a600eba03215ca90cb574aecf8d3f096db2e434",
+          "lib/accounting.mjs": "9ef56168269b3204b76d323ccd4498088ac7b3be930e3c9d645afd8c465d30dc",
+          "assets/whale-widget.js": "d5ff4528db6f5cde1e522f0d7f4fa827158915aa270d8070b88ee6f3d4ed4842"
+        }
+      },
+      "license": "MIT code; artwork/audio per PROVENANCE.md"
+    },
+    {
+      "id": "skin-center",
+      "name": "@linxin666/dsh-client-ui-skin-center",
+      "version": "0.4.4",
+      "kind": "upstream",
+      "artifact": "dsh-client-ui-skin-center-0.4.4.tgz",
+      "tarball": "https://registry.npmjs.org/@linxin666/dsh-client-ui-skin-center/-/dsh-client-ui-skin-center-0.4.4.tgz",
+      "integrity": "sha512-5X6SHGV4bWncapW8+9jIM5F+4rQR+YZ2EMyuwnkfvw5rB1OW3eAKI9HpTsE4nEORZW9r6jxwT5FkMVr6+OB2vQ==",
+      "repository": "https://github.com/zhu1090093659/dsh-skins",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "adaptive-plan",
+      "kind": "external",
+      "repository": "https://github.com/Yaaaaaaa233/dsh-adaptive-plan",
+      "status": "desktop-adaptation-pending",
+      "distributed": false
+    }
+  ]
+}

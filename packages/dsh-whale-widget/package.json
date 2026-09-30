@@ -1,0 +1,59 @@
+{
+  "name": "dsh-whale-widget",
+  "version": "0.3.17-desktop.3",
+  "description": "官方 DeepSeek Harness Desktop 余额挂件适配：一级用量设置、即时挂件开关与菜单同步。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "balance",
+    "widget"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "assets",
+    "cordis.patch.yml",
+    "README.md",
+    "PROVENANCE.md",
+    "DESKTOP.md",
+    "UPSTREAM_README.md",
+    "ADAPTATION.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yaaaaaaa233/dsh-desktop.git",
+    "directory": "packages/dsh-whale-widget"
+  },
+  "bugs": {
+    "url": "https://github.com/Yaaaaaaa233/dsh-desktop/issues"
+  },
+  "homepage": "https://github.com/Yaaaaaaa233/dsh-desktop/tree/main/packages/dsh-whale-widget#readme",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-renderer"
+      ]
+    },
+    "engines": {
+      "dsh": "0.2.0-rc.2"
+    }
+  },
+  "license": "MIT",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": "0.2.0-rc.2",
+    "react": "^18.2.0"
+  }
+}

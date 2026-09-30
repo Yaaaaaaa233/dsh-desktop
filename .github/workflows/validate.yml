@@ -1,0 +1,31 @@
+name: Validate and package
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+      - run: npm run check
+      - run: npm test
+      - run: npm run pack
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: desktop-plugin-packages
+          path: |
+            dist/*.tgz
+            dist/SHA256SUMS
+            dist/release-manifest.json
+          if-no-files-found: error

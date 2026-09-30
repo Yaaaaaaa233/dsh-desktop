@@ -31,3 +31,16 @@ web-profile-backup-*/
 
 # 多内核并存的运行时构建产物（runtime-016 等）
 runtime*/
+
+# 官方 Desktop 适配项目的本地数据与发布产物
+/dist/
+/backups/
+/.test-home/
+/.cache/
+**/.dsh/
+**/.dshw-*.json
+**/credentials.json
+**/settings.yaml
+**/settings.yaml.imported
+**/skin-center-active.json
+*.tgz

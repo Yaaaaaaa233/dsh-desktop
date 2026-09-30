@@ -1,96 +1,66 @@
-# DSH Desktop
+# DSH Desktop · 插件适配与改造
 
-把 DeepSeek Harness（终端 + Web）打包成 macOS 桌面应用：Electron 窗口内直接加载 DSH 的
-Web UI，后端一键自动启动、随应用退出，并支持主题色 / 背景定制与自定义 CSS。
-可打包为 `/Applications` 里可双击运行的正式 `.app`。
+为**官方 DeepSeek Harness 桌面端**维护社区插件适配、界面定制和迁移经验。
 
-## 原理
+从 **v0.2.0** 开始，本仓库转向官方 Desktop 的扩展开发。原来的 Electron 桌面壳已冻结在 [legacy/electron-shell](legacy/electron-shell) 和标签 [`legacy-electron-shell-20260930`](https://github.com/Yaaaaaaa233/dsh-desktop/tree/legacy-electron-shell-20260930)。旧项目仍可查阅和复现，不再作为当前产品继续维护。
 
-```
-┌──────────────────────────────────────┐
-│  DSH Desktop.app（标准 macOS 应用包） │
-│  ├─ Contents/MacOS/DSH Desktop       │  Electron 主进程
-│  │   ├─ 首次启动解压内置运行时         │
-│  │   │   └─ dsh-runtime.tar.gz → userData
-│  │   ├─ 派生捆绑的 node v24           │
-│  │   │   └─ dsh web --port 0          │  用 OS 分配端口，避免冲突
-│  │   ├─ BrowserWindow 加载该 URL      │  原汁原味的 DSH Web UI
-│  │   └─ 外观设置注入 CSS              │  主题色/背景/自定义 CSS，实时生效
-│  └─ Contents/Resources/              │
-│      ├─ dsh-runtime.tar.gz           │  最小自包含 DSH 后端（build-runtime.js 产物）
-│      └─ node/bin/node                │  独立 Node 24 运行时
-└──────────────────────────────────────┘
-```
+本项目由社区维护，与 DeepSeek 官方没有隶属关系。仓库名继续使用 `dsh-desktop`。
 
-- **自包含**：不依赖系统 Node / DSH 仓库 / 网络，双击即用；数据默认存到 `$DSH_HOME`
-  （默认 `~/.dsh`），与命令行 / 网页版完全共享会话与配置。
-- 后端用 `--port 0` 请求系统分配端口，主进程解析 stdout 里的 `dsh web: http://…` 行，
-  因此与本机其它服务（包括原来的 3080 端口 GUI）互不冲突。
-- 不修改 DSH 源码：外观定制通过 `webContents.insertCSS` 覆盖 DSH 的 CSS 变量
-  （`--dsw-static-deepseek-*` 品牌色阶、`--dsw-alias-bg-*` 应用表面背景）。
+## 当前功能
 
-## 开发态运行（需要系统 Node ≥ 24 + DSH 仓库）
+| 插件 / 功能 | 维护方式 | 状态 |
+| --- | --- | --- |
+| [鲸鱼余额挂件](packages/dsh-whale-widget) | 本仓库维护 Desktop 适配源码和安装包 | 已验证：实际余额、一级「用量显示」设置页、即时挂件开关、菜单同步 |
+| [皮肤中心](integrations/skin-center) | 锁定已验证的上游版本，提供安装与迁移说明 | 已验证：自定义壁纸、配色、原皮肤与重启恢复 |
+| [Adaptive Plan / Mids·快速](https://github.com/Yaaaaaaa233/dsh-adaptive-plan) | 保持独立仓库 | 官方 Desktop 适配待完成，本次不纳入安装包 |
+
+**当前验证环境：官方 Desktop `0.2.0-rc.2`，macOS Apple Silicon。** 官方发布页仍将该版本标记为候选版。Windows、Linux 和其他 DSH 版本暂未验证；详情见 [兼容性](docs/compatibility.md)。
+
+## 安装
+
+1. 安装 [官方 DeepSeek Harness Desktop](https://github.com/deepseek-ai/deepseek-harness/releases)。
+2. 从本仓库 [Releases](https://github.com/Yaaaaaaa233/dsh-desktop/releases) 下载鲸鱼适配包。
+3. 完整退出官方客户端，使用它提供的 `dsh` 命令安装到 **desktop profile**：
 
 ```sh
-cd dsh-desktop
-npm install        # 首次（会下载 Electron 二进制）
-npm start          # 使用 ~/dev/deepseek-harness 的构建产物启动
+dsh plugin --profile desktop add /绝对路径/dsh-whale-widget-0.3.17-desktop.3.tgz
+dsh plugin --profile desktop add @linxin666/dsh-client-ui-skin-center@0.4.4
 ```
 
-可选环境变量：`DSH_REPO`（仓库路径）、`DSH_NODE`（后端 node）、`DSH_HOME`（覆盖数据目录）。
+若未注册 `dsh` 命令，可在官方客户端菜单中管理；macOS 也可以直接调用应用内的 CLI。完整命令、离线包、卸载和 pnpm store 排查见 [安装说明](docs/installation.md)。
 
-## 打包成正式 .app（/Applications 可双击）
+启动后在「设置 → 用量显示」管理鲸鱼，在「设置 → 皮肤」管理外观。挂件设置中的开关即时生效；插件管理页整个包的启停建议完整重启客户端。
 
-前置：DSH 仓库已构建（`pnpm run build`）。
+## 从旧 DSH 迁移
+
+Web 与 Desktop 使用各自的插件 profile，但默认共享 `~/.dsh` 数据目录。先备份，再在 Desktop 中安装独立插件；已有 v2 皮肤可继续使用。旧账本保留在新版的历史字段中，新版观测统计从迁移时开始。
+
+按 [迁移说明](docs/migration.md) 操作。个人配置、凭据、账本和壁纸不随仓库发布。两个客户端共用鲸鱼账本时，避免同时运行两个挂件实例。
+
+## 开发
+
+仓库根目录是开发与打包入口，不是可直接安装的 DSH 插件。当前工具只使用 Node 内置模块，无需在根目录安装依赖。
 
 ```sh
-cd /Users/yea/Documents/DSH/dsh-desktop
-npm run build:app
-# 内部流程：make-icon → build-runtime（从 DSH 仓库扁平复制生产闭包，无符号链接、单实例）→ make-runtime-archive → electron-builder
-# 产物：dist-app/mac-arm64/DSH Desktop.app
+npm run check
+npm test
+npm run pack
 ```
 
-安装到应用程序文件夹：
+`pack` 会打包本地鲸鱼插件，并下载、校验锁定版本的上游皮肤中心包。产物在 `dist/`：两个 `.tgz`、`SHA256SUMS` 和 `release-manifest.json`。不会自动安装到用户的 DSH。
 
-```sh
-cp -R "dist-app/mac-arm64/DSH Desktop.app" /Applications/
-open "/Applications/DSH Desktop.app"       # 首次启动会解压运行时（约 400MB，需十几秒）
+```text
+packages/dsh-whale-widget/   本地维护的鲸鱼 Desktop 适配
+integrations/skin-center/   上游皮肤中心的版本与迁移说明
+catalog.json                插件清单、版本与上游完整性
+docs/                       安装、迁移、兼容性与开发约定
+scripts/                    检查与打包工具
+tests/                      账本迁移回归检查
+legacy/electron-shell/      冻结的旧桌面壳
 ```
 
-> 说明：
-> - 未签名（无 Developer ID）：首次打开若被 Gatekeeper 拦截，右键 →「打开」→「打开」即可。
-> - 已内置自定义图标（默认：DSH 鲸鱼 × DeepSeek 蓝渐变；换图：`DSH_ICON_SRC=/path/to/icon.jpg npm run make:icon`，会居中裁方并加 macOS 圆角）。
-> - 运行时解压到 `~/Library/Application Support/DSH Desktop/dsh-runtime`，仅首次执行；
->   应用升级（归档内容变化）会自动重新解压。
+下一步优先补充不同平台的验证记录、跟进官方插件生命周期和 Adaptive Plan 的 Desktop 适配。新增插件遵循 [开发约定](docs/development.md)。
 
-## 使用
+## 许可与来源
 
-- **外观设置**：菜单「视图 → 外观设置…」（快捷键 `⌘⇧B`），可设置
-  - 主题色（DSH 的主品牌色，实时重映射界面高亮/按钮/选中态）
-  - 背景：默认 / 纯色 / 渐变 / 图片（图片自动缩放铺满、可选不透明度与可读性遮罩）
-  - 自定义 CSS：追加到页面末尾，覆盖任意样式
-  - 设置自动保存在 `~/Library/Application Support/DSH Desktop/settings.json`
-- 菜单「视图 → 在浏览器中打开」：用系统浏览器打开同一后端
-- 菜单「视图 → 重启 DSH 后端」：后端崩溃或改配置后重启
-- 窗口关闭即退出应用并停止后端；再次启动可继续原有会话
-
-## 自检
-
-```sh
-node scripts/selftest.js                                 # 纯 Node 单测
-npm run e2e:backend                                      # 开发态后端 E2E
-npm run e2e:packaged                                     # 打包态 E2E（解压 + 启动）
-DSH_DESKTOP_SMOKE=1 npm start                            # 冒烟（隐藏窗口加载后自动退出）
-```
-
-日志：`~/Library/Application Support/DSH Desktop/backend.log`
-
-## 已知限制
-
-- 后端依赖 Node ≥ 24（已随应用捆绑独立 node，无需系统安装）。
-- runtime 由 `scripts/build-runtime.js` 从 DSH 仓库扁平构建（无符号链接、单实例、自包含）；早先的 `pnpm deploy` 方案已弃用（会报 `[ERR_PNPM_CANNOT_DEPLOY]`：其链接结构导致同依赖双实例、scope 机制失灵等运行时问题）。
-- 背景图以缩放后的 data URL 注入，超大图片（>1920px 宽）自动缩到 1920px 内。
-- 透明背景图层是「整个应用表面变透明 + 遮罩」的近似实现，个别弹层/对话框底色可能偏透，
-  可用自定义 CSS 微调。
-- 应用未做代码签名与公证（个人使用无碍；对外分发需 Developer ID + notarization）。
-- 多实例共用数据目录：桌面端与命令行版默认共用 `~/.dsh`。内核 ≥ 0.1.5-rc.2 的会话写入有 per-session flock 写锁，两个实例同时打开同一会话时第二个会被拒绝写入（应用会弹"会话已占用"通知），不会写坏日志；0.1.5-rc.2 之前的内核（如 0.1.0-rc.5）无此保护，勿与桌面端并行操作同一会话。
+本仓库自己维护的代码使用 MIT。鲸鱼上游代码保留 MeteorNOX 的 MIT 声明，**美术与音效不属于 MIT 范围**，按上游 [PROVENANCE](packages/dsh-whale-widget/PROVENANCE.md) 随原插件提供。皮肤中心保持上游 Apache-2.0 许可，冻结项目保留原第三方声明。见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

@@ -1,0 +1,5 @@
+# 本包的挂载声明：安装到官方 Desktop profile。
+# dsh plugin --profile desktop add /absolute/path/dsh-whale-widget-0.3.17-desktop.3.tgz
+- insert:
+    - id: dsh-whale-widget
+      name: dsh-whale-widget
